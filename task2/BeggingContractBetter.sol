@@ -91,19 +91,20 @@ contract BeggingContractBetter{
         emit DonationEvent(msg.sender,msg.value);  
     }
 
-    function updateTopDonation (address donor,uint256 amount) public onlyDuringTime{
+    function updateTopDonation (address _addr,uint256 amount) public onlyDuringTime{
      
         // 检查是否能进入前三名
         for (uint256 i = 0; i < 3; i++) {
-            if (amount > TopDonoration[i].amount) {
+            if (amount > topDonoration[i].amount) {
                 // 下移已有记录，为新记录腾出位置
+                //0,1,2位置,类似插入排序
                 for (uint256 j = 2; j > i; j--) {
-                    if (TopDonoration[j-1].donor != address(0)) {
-                        TopDonoration[j] = TopDonoration[j-1];
+                    if (topDonoration[j-1].addr != address(0)) {
+                        topDonoration[j] = topDonoration[j-1];
                     }
                 }
                 // 插入新记录
-                TopDonoration[i] = TopDonoration(donor, amount);
+                topDonoration[i] = TopDonoration(_addr, amount);
                 break;
             }
         }
@@ -111,7 +112,7 @@ contract BeggingContractBetter{
     
     
     function getTopDonors() public view returns (TopDonoration[3] memory) {
-        return TopDonoration;
+        return topDonoration;
     }
 
     function getRemainingTime() public view returns (uint256) {
@@ -130,7 +131,7 @@ contract BeggingContractBetter{
         require(balance>0,"No funds to withdraw");
         //转账给所有者
         _owner.transfer(balance);
-         totalDonations -= msg.value;
+         totalDonations -= balance;
         emit WithdrawEvent(_owner,balance); 
     }
 
